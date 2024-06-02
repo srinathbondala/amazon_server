@@ -3,8 +3,6 @@ package com.example.amazon_server.controler;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,15 +27,17 @@ public class amazonController {
     }
 
     @GetMapping("/data")
-    public ResponseEntity<List<Product>> data(){
-        HttpHeaders headers = new HttpHeaders();
-    headers.setCacheControl("max-age=3600, must-revalidate");
-        return ResponseEntity.ok().headers(headers).body(service.getAllProducts());
+    public List<Product> data(){
+        return service.getAllProducts();
     }
 
     @GetMapping("/dataByCategory/{category}")
     public List<product_data> dataByCategory(@PathVariable String category){
-        return service.getProductByCatagory(category);
+        String[] categories = category.split("-");
+        if(categories.length > 1){
+            return service.getProductBySubCategory(categories[0],categories[1]);
+        }
+        return service.getProductByCatagory(categories[0]);
     }
 
     @GetMapping("/dataByCategory/{category}/{feature}")

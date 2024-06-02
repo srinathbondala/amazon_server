@@ -39,6 +39,12 @@ public class amazonService {
         query.fields().include("id", "category", "imageUrl", "imageTitle", "count", "rating", "ratingCount", "shipping","title","price");
         return mongoTemplate.find(query, product_data.class);
     }
+
+    public List<product_data> getProductBySubCategory(String category,String subcategory){
+        Query query = new Query(Criteria.where("category").is(category).and("subcategory").is(subcategory)).limit(20);
+        query.fields().include("id", "category", "imageUrl", "imageTitle", "count", "rating", "ratingCount", "shipping","title","price");
+        return mongoTemplate.find(query, product_data.class);
+    }
     
     public List<product_data> getProductByFeature(String category,String feature){
         Query query = new Query(Criteria.where("category").is(category)).limit(20);
@@ -121,7 +127,6 @@ public class amazonService {
         ObjectId objectId = new ObjectId();
         product.setId(objectId.toString());
         saveProductData(product);
-        
     }
 
     public void deleteProducts(String id){

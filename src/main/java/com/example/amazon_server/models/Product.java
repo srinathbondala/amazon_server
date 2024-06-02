@@ -11,13 +11,13 @@ public class Product {
     private String id;
     private String title;
     private List<String> imageUrls;
-    private String link;
+    private List<String> link;
     private String category;
 
     public Product() {
     }
 
-    public Product(String title, List<String> imageUrls, String link, String category) {
+    public Product(String title, List<String> imageUrls, List<String> link, String category) {
         this.title = title;
         this.imageUrls = imageUrls;
         this.link = link;
@@ -48,11 +48,11 @@ public class Product {
         this.imageUrls = imageUrls;
     }
 
-    public String getLink() {
+    public List<String> getLink() {
         return link;
     }
 
-    public void setLink(String link) {
+    public void setLink(List<String> link) {
         this.link = link;
     }
 

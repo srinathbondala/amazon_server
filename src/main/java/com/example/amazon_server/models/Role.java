@@ -1,18 +1,36 @@
 package com.example.amazon_server.models;
 
-public enum Role {
-    GENERAL("GENERAL"),
-    USER("USER"),
-    SELLER("SELLER"),
-    ADMIN("ADMIN");
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-    private final String roleName;
+@Document(collection = "roles")
+public class Role {
+  @Id
+  private String id;
 
-    Role(String roleName) {
-        this.roleName = roleName;
-    }
+  private ERole name;
 
-    public String getRoleName() {
-        return roleName;
-    }
+  public Role() {
+
+  }
+
+  public Role(ERole name) {
+    this.name = name;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public ERole getName() {
+    return name;
+  }
+
+  public void setName(ERole name) {
+    this.name = name;
+  }
 }

@@ -1,5 +1,6 @@
 package com.example.amazon_server.models;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -24,25 +25,35 @@ public class product_data {
     private String category;
     private String return_policy;
     private String warranty;
-    private String Brand;
+    private String brand;
     private List<comments> comments;
     private String delivary;
-    private String Recomended_use;
-    private String Item_weight;
-    private String Item_dimensions;
+    private List<Map<String, String>> features;
+    private String recomended_use;
+    private String item_weight;
+    private String item_dimensions;
     private String color;
     private String special_features;
-    private String ASIN;
+    private String asin;
     private String stock;
-    private String ArivalDate;
+    private String arivalDate;
+    private String subcategory;
 
-    public product_data(String title, String imageUrl, List<String> description, String material, String rating, String ratingCount, String count, String price, String shipping, List<String> moreBuyingChoices, String discount, String deal, String category, String return_policy, String warranty, String Brand, List<comments> comments, String delivary, String Recomended_use, String Item_weight, String Item_dimensions, String color, String special_features, String ASIN, String stock,  ratingtemplate ratingVal, String ArivalDate) {
+    
+    public product_data(String id, String title, String imageUrl, List<String> description, String material,
+            String rating, String ratingCount, ratingtemplate ratingVal, String count, String price, String shipping,
+            List<String> moreBuyingChoices, String discount, String deal, String category, String return_policy,
+            String warranty, String brand, List<com.example.amazon_server.models.comments> comments, String delivary,
+            String recomended_use, String item_weight, String item_dimensions, String color, String special_features,
+            String asin, String stock, String arivalDate, String subcategory, List<Map<String, String>> features) {
+        this.id = id;
         this.title = title;
         this.imageUrl = imageUrl;
         this.description = description;
         this.material = material;
         this.rating = rating;
         this.ratingCount = ratingCount;
+        this.ratingVal = ratingVal;
         this.count = count;
         this.price = price;
         this.shipping = shipping;
@@ -52,19 +63,21 @@ public class product_data {
         this.category = category;
         this.return_policy = return_policy;
         this.warranty = warranty;
-        this.Brand = Brand;
+        this.brand = brand;
         this.comments = comments;
         this.delivary = delivary;
-        this.Recomended_use = Recomended_use;
-        this.Item_weight = Item_weight;
-        this.Item_dimensions = Item_dimensions;
+        this.recomended_use = recomended_use;
+        this.item_weight = item_weight;
+        this.item_dimensions = item_dimensions;
         this.color = color;
         this.special_features = special_features;
-        this.ASIN = ASIN;
+        this.asin = asin;
         this.stock = stock;
-        this.ratingVal= ratingVal;
-        this.ArivalDate=ArivalDate;
+        this.arivalDate = arivalDate;
+        this.subcategory = subcategory;
+        this.features = features;
     }
+
     // public product_data(String title, String imageUrl, String description, String material, String rating, String ratingCount, String count, String price, String shipping, String moreBuyingChoices, String discount, String deal, String category) {
         //     this.title = title;
         //     this.imageUrl = imageUrl;
@@ -80,9 +93,24 @@ public class product_data {
         //     this.deal = deal;
         //     this.category = category;
         // }
-        
-    public String getASIN() {
-        return ASIN;
+    public String getSubcategory() {
+        return subcategory;
+    }
+
+    public void setSubcategory(String subcategory) {
+        this.subcategory = subcategory;
+    }
+    
+    public List<Map<String, String>> getFeatures() {
+        return features;
+    }
+
+    public void setFeatures(List<Map<String, String>> features) {
+        this.features = features;
+    }
+
+    public String getasin() {
+        return asin;
     }
 
     public ratingtemplate getRatingVal() {
@@ -95,8 +123,8 @@ public class product_data {
     public product_data() {
     }
 
-    public void setASIN(String ASIN) {
-        this.ASIN = ASIN;
+    public void setASIN(String asin) {
+        this.asin = asin;
     }
 
     public String getStock() {
@@ -132,11 +160,11 @@ public class product_data {
     }
 
     public String getBrand() {
-        return Brand;
+        return brand;
     }
 
     public void setBrand(String Brand) {
-        this.Brand = Brand;
+        this.brand = Brand;
     }
 
     public List<comments> getComments() {
@@ -156,27 +184,27 @@ public class product_data {
     }
 
     public String getRecomended_use() {
-        return Recomended_use;
+        return recomended_use;
     }
 
     public void setRecomended_use(String Recomended_use) {
-        this.Recomended_use = Recomended_use;
+        this.recomended_use = Recomended_use;
     }
 
     public String getItem_weight() {
-        return Item_weight;
+        return item_weight;
     }
 
     public void setItem_weight(String Item_weight) {
-        this.Item_weight = Item_weight;
+        this.item_weight = Item_weight;
     }
 
     public String getItem_dimensions() {
-        return Item_dimensions;
+        return item_dimensions;
     }
 
-    public void setItem_dimensions(String Item_dimensions) {
-        this.Item_dimensions = Item_dimensions;
+    public void setItem_dimensions(String item_dimensions) {
+        this.item_dimensions = item_dimensions;
     }
 
     public String getColor() {
@@ -299,10 +327,10 @@ public class product_data {
     }
 
     public String getArivalDate() {
-        return ArivalDate;
+        return arivalDate;
     }
 
     public void setArivalDate(String arivalDate) {
-        ArivalDate = arivalDate;
+        this.arivalDate = arivalDate;
     }
 }
