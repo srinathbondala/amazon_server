@@ -6,15 +6,20 @@ import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.amazon_server.models.CartDetails;
+import com.example.amazon_server.models.comments;
+import com.example.amazon_server.models.orders;
+import com.example.amazon_server.services.amazonService;
 import com.example.amazon_server.services.authservice;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+
 
 
 @RestController
@@ -24,6 +29,8 @@ public class userController {
 
     @Autowired
     private authservice authservice;
+    @Autowired
+    private amazonService amazonService;
 
     @PostMapping("/addToCart")
     // @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
@@ -122,4 +129,19 @@ public class userController {
             return ResponseEntity.ok("Error");
         }
     }
+    @GetMapping("/isProductOrdered/{productId}")
+    public ResponseEntity<?> getMethodName(@PathVariable String productId, @RequestHeader("Authorization") String token){
+        return ResponseEntity.ok(authservice.isProductOrdered(productId, token));
+    }
+    
+    @PostMapping("/addOrder")
+    public ResponseEntity<?> addOrder(@RequestBody orders data,@RequestHeader("Authorization") String token){
+        return authservice.addOrder(data,token);
+    }
+
+    @PostMapping("/addReview/{id}")
+    public ResponseEntity<?> addReview(@RequestBody comments comment, @PathVariable String id, @RequestHeader("Authorization") String token){
+        return amazonService.addReview(comment,id,token);
+    }
+    
 }

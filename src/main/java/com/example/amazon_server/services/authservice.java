@@ -22,6 +22,7 @@ import com.example.amazon_server.jwt.JwtUtils;
 import com.example.amazon_server.models.CartDetails;
 import com.example.amazon_server.models.CartProductDetails;
 import com.example.amazon_server.models.authData;
+import com.example.amazon_server.models.orders;
 import com.example.amazon_server.models.product_data;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -98,7 +99,7 @@ public class authservice {
         }
     }
 
-    private String getUserIdFromJwt(Object object){
+    public String getUserIdFromJwt(Object object){
         try{
             String jsonString = objectMapper.writeValueAsString(object);
             JsonNode userDetailsNode = objectMapper.readTree(jsonString);
@@ -248,6 +249,40 @@ public class authservice {
             return mongoTemplate.findOne(query, authData.class);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error processing request");
+        }
+    }
+
+    public String isProductOrdered(String productId , Object body) {
+        try {
+            String userId = getUserIdFromJwt(body);
+            return isProductOrderedTrue(productId, userId);
+        } catch (Exception e) {
+            return "false";
+        }
+    }
+    private String isProductOrderedTrue(String productId, String userId) {
+        Query query = new Query(Criteria.where("orders.product_id").is(productId).and("cart.isCancelled").is(false));
+        return mongoTemplate.exists(query, authData.class) ? "true " : "false";
+    }
+
+    public ResponseEntity<?>addOrder(orders data,String token) {
+        try {
+            String userId = getUserIdFromJwt(token);
+            return ResponseEntity.ok(addOrderToDataBase(userId, data));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error processing request");
+        }
+    }
+
+    private String addOrderToDataBase(String userId, orders data) {
+        try{
+            Query query = new Query(Criteria.where("id").is(userId));
+            Update update = new Update().push("orders", data);
+            mongoTemplate.updateFirst(query, update, authData.class);
+            return "Order added successfully";
+        }
+        catch(Exception e){
+            return e.getMessage();
         }
     }
 }

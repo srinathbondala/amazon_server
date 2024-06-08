@@ -12,10 +12,14 @@ import org.springframework.stereotype.Service;
 import com.example.amazon_server.Repository.amazonrepo;
 import com.example.amazon_server.Repository.productrepo;
 import com.example.amazon_server.models.Product;
+import com.example.amazon_server.models.comments;
 import com.example.amazon_server.models.product_data;
 import com.example.amazon_server.models.ratingtemplate;
+import com.mongodb.client.result.UpdateResult;
 
-import org.springframework.data.mongodb.core.query.Query; 
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Sort;
 
 @Service
@@ -24,6 +28,8 @@ public class amazonService {
     private amazonrepo repo;
     @Autowired
     private productrepo prepo;
+    @Autowired
+    private authservice authservice;
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -145,5 +151,81 @@ public class amazonService {
 
     public void deleteAll(){
         prepo.deleteAll();
+    }
+
+     public ResponseEntity<?> addReview(comments comment, String id, String token) {
+        try{
+            String userId = authservice.getUserIdFromJwt(token);
+            return ResponseEntity.ok(addReviewToProduct(userId,comment,id));
+        }
+        catch(Exception e){
+            return ResponseEntity.badRequest().body("Error processing request");
+        }
+    }
+    private ResponseEntity<?> addReviewToProduct(String userId,comments comment,String id){
+        try{
+            Query query = new Query();
+            Criteria criteria = Criteria.where("_id").is(id).and("comments.user_id").is(userId);
+            query.addCriteria(criteria);
+            Update update = new Update().set("comments.$", comment);
+            UpdateResult result = mongoTemplate.updateFirst(query, update, product_data.class);
+            if (result.getMatchedCount() == 0) {
+                Query userQuery = new Query(Criteria.where("_id").is(id));
+                Update addToCartUpdate = new Update().push("comments", comment);
+                result = mongoTemplate.updateFirst(userQuery, addToCartUpdate, product_data.class);
+                updateRatingFields(comment.getRating(),id);
+                }
+                else{
+                    return ResponseEntity.ok("Already Submitted");
+                    }
+                return ResponseEntity.ok(result);
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    private void updateRatingFields(String newrating,String productId) {
+        Query query = new Query(Criteria.where("_id").is(productId));
+        product_data product = mongoTemplate.findOne(query, product_data.class);
+        if (product == null) {
+            throw new IllegalArgumentException("Product not found");
+        }
+        int newRatingCount = Integer.parseInt(product.getRatingCount()) + 1;
+        Update update = new Update().set("ratingCount", String.valueOf(newRatingCount));
+        ratingtemplate ratingVal = product.getRatingVal();
+        int newRating = Integer.parseInt(newrating);
+        switch (newRating) {
+            case 1:
+                update.set("ratingVal.rate1", String.valueOf(Integer.parseInt(ratingVal.getRate1())+1));
+                break;
+            case 2:
+                update.set("ratingVal.rate1", String.valueOf(Integer.parseInt(ratingVal.getRate2())+1));
+                break;
+            case 3:
+                update.set("ratingVal.rate1", String.valueOf(Integer.parseInt(ratingVal.getRate3())+1));
+                break;
+            case 4:
+                update.set("ratingVal.rate1", String.valueOf(Integer.parseInt(ratingVal.getRate4())+1));
+                break;
+            case 5:
+                update.set("ratingVal.rate1", String.valueOf(Integer.parseInt(ratingVal.getRate5())+1));
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid rating value");
+        }
+        double newOverallRating = calculateOverallRating(ratingVal);
+        update.set("rating",String.format("%.1f", newOverallRating)+" out of 5 stars");
+        mongoTemplate.updateFirst(query, update, product_data.class);
+    }
+    private double calculateOverallRating(ratingtemplate ratingVal) {
+        int rate1 = Integer.parseInt(ratingVal.getRate1());
+        int rate2 = Integer.parseInt(ratingVal.getRate2());
+        int rate3 = Integer.parseInt(ratingVal.getRate3());
+        int rate4 = Integer.parseInt(ratingVal.getRate4());
+        int rate5 = Integer.parseInt(ratingVal.getRate5());
+
+        int totalRatings = rate1 + rate2 + rate3 + rate4 + rate5;
+        int sumRatings = rate1 * 5 + rate2 * 4 + rate3 * 3 + rate4 * 2 + rate5 * 1;
+
+        return (double) sumRatings / totalRatings;
     }
 }

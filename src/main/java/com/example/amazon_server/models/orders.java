@@ -7,6 +7,9 @@ import org.springframework.data.util.Pair;
 public class orders {
     private String order_id;
     private String order_date;
+    private String product_id;
+    private Boolean isDelivered;
+    private Boolean isCancelled;
     private String delivery_date;
     private List<Pair<String,String>> order_status;
     private String totalPrice;
@@ -16,14 +19,41 @@ public class orders {
     }
     
     public orders(String order_id, String order_date, String delivery_date, List<Pair<String, String>> order_status,
-            String totalPrice, Details shippingAddress) {
+            String totalPrice, Details shippingAddress , String product_id , Boolean isDelivered , Boolean isCancelled) {
         this.order_id = order_id;
         this.order_date = order_date;
         this.delivery_date = delivery_date;
         this.order_status = order_status;
         this.totalPrice = totalPrice;
         this.shippingAddress = shippingAddress;
+        this.product_id = product_id;
+        this.isDelivered = isDelivered;
+        this.isCancelled = isCancelled;
     }
+    public String getProduct_id() {
+        return product_id;
+    }
+
+    public void setProduct_id(String product_id) {
+        this.product_id = product_id;
+    }
+
+    public Boolean getIsDelivered() {
+        return isDelivered;
+    }
+
+    public void setIsDelivered(Boolean isDelivered) {
+        this.isDelivered = isDelivered;
+    }
+
+    public Boolean getIsCancelled() {
+        return isCancelled;
+    }
+
+    public void setIsCancelled(Boolean isCancelled) {
+        this.isCancelled = isCancelled;
+    }
+
     public String getOrder_id() {
         return order_id;
     }
