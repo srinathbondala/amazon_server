@@ -1,5 +1,6 @@
 package com.example.amazon_server.services;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import com.example.amazon_server.Repository.authrepo;
 import com.example.amazon_server.jwt.JwtUtils;
 import com.example.amazon_server.models.CartDetails;
+import com.example.amazon_server.Repository.ordersrepo;
 import com.example.amazon_server.models.CartProductDetails;
 import com.example.amazon_server.models.authData;
 import com.example.amazon_server.models.orders;
@@ -33,7 +35,10 @@ public class authservice {
     @Autowired
     authrepo authrepo;
 
-     @Autowired
+    @Autowired
+    ordersrepo ordersrepo;
+
+    @Autowired
     JwtUtils jwtUtils;
 
     @Autowired
@@ -276,8 +281,14 @@ public class authservice {
 
     private String addOrderToDataBase(String userId, orders data) {
         try{
+            data.setUserId(userId);
+            data.setIsDelivered(false);
+            data.setIsCancelled(false);
+            data.setOrder_date(new Date().toString());
+            orders savedOrder = ordersrepo.save(data);
+            String orderdata = savedOrder.getOrder_id();
             Query query = new Query(Criteria.where("id").is(userId));
-            Update update = new Update().push("orders", data);
+            Update update = new Update().push("orders",orderdata);
             mongoTemplate.updateFirst(query, update, authData.class);
             return "Order added successfully";
         }

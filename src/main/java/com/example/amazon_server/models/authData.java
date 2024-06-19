@@ -34,7 +34,7 @@ public class authData {
      @DBRef
     private Set<Role> roles = new HashSet<>();
 
-    private Details details;
+    private List<Details> details;
 
     private List<CartDetails> cart;
     
@@ -42,7 +42,7 @@ public class authData {
     
     private List<String> wishList;
 
-    private List<orders> orders;
+    private List<String> orders;
     
     public authData() {
     }
@@ -53,11 +53,11 @@ public class authData {
       this.password = password;
     }
     
-    public List<orders> getOrders() {
+    public List<String> getOrders() {
       return orders;
     }
 
-    public void setOrders(List<orders> orders) {
+    public void setOrders(List<String> orders) {
       this.orders = orders;
     }
 
@@ -70,7 +70,7 @@ public class authData {
         this.cart.remove(orderDetails);
     }
 
-    public Details getDetails() {
+    public List<Details> getDetails() {
       return details;
     }
     
@@ -90,7 +90,7 @@ public class authData {
       this.wishList = wishList;
     }
 
-    public void setDetails(Details details) {
+    public void setDetails(List<Details> details) {
       this.details = details;
     }
 

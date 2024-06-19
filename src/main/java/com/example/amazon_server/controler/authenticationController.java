@@ -15,7 +15,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,6 +52,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+
 
 
 @RestController
@@ -221,6 +224,31 @@ public class authenticationController {
         }
         throw new UsernameNotFoundException("User not found with email: " + email);
     }
+
+    @PostMapping("/validateUser")
+    public ResponseEntity<?> getMethodName(@Valid @RequestBody LoginRequest loginRequest, @RequestHeader("Authorization") String token) {
+        try {
+            String username="";
+            UserDetails userDetails;
+            String jwt = token.substring(7); 
+            username = jwtUtils.getUserNameFromJwtToken(jwt);
+
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() != null) {
+                userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+                if(passwordEncoder.matches(loginRequest.getPassword(), userDetails.getPassword())){
+                    return ResponseEntity.ok("Success");
+                }
+            } else {
+                return ResponseEntity.badRequest().body("Invalid token or user not authenticated");
+            }
+        } catch (ClassCastException e) {
+            return ResponseEntity.badRequest().body("Error processing user details");
+        }
+        return ResponseEntity.ok("Invalid");
+    }
+    
+
     @DeleteMapping("/deleteuser/{email}")
     public void deleteUser(@PathVariable String email) {
         authservice.deleteUser(email);

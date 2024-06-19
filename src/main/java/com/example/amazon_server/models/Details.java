@@ -1,6 +1,10 @@
 package com.example.amazon_server.models;
 
+import org.springframework.data.annotation.Id;
+
 public class Details {
+    @Id
+    private String id;
     private String address;
     private String city;
     private String state;

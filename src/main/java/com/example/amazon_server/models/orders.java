@@ -2,24 +2,37 @@ package com.example.amazon_server.models;
 
 import java.util.List;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.util.Pair;
 
+@Document(collection = "orders")
 public class orders {
+    @Id
     private String order_id;
     private String order_date;
-    private String product_id;
+    private List<String> product_id;
     private Boolean isDelivered;
     private Boolean isCancelled;
     private String delivery_date;
     private List<Pair<String,String>> order_status;
     private String totalPrice;
     private Details shippingAddress;
+    private String userId;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public orders() {
     }
     
     public orders(String order_id, String order_date, String delivery_date, List<Pair<String, String>> order_status,
-            String totalPrice, Details shippingAddress , String product_id , Boolean isDelivered , Boolean isCancelled) {
+            String totalPrice, Details shippingAddress , List<String> product_id , Boolean isDelivered , Boolean isCancelled, String userId) {
         this.order_id = order_id;
         this.order_date = order_date;
         this.delivery_date = delivery_date;
@@ -29,12 +42,13 @@ public class orders {
         this.product_id = product_id;
         this.isDelivered = isDelivered;
         this.isCancelled = isCancelled;
+        this.userId = userId;
     }
-    public String getProduct_id() {
+    public List<String> getProduct_id() {
         return product_id;
     }
 
-    public void setProduct_id(String product_id) {
+    public void setProduct_id(List<String> product_id) {
         this.product_id = product_id;
     }
 
