@@ -38,6 +38,7 @@ public class product_data {
     private String stock;
     private String arivalDate;
     private String subcategory;
+    private String categoryId;
 
     
     public product_data(String id, String title, String imageUrl, List<String> description, String material,
@@ -107,6 +108,14 @@ public class product_data {
 
     public void setFeatures(List<Map<String, String>> features) {
         this.features = features;
+    }
+
+    public String getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getasin() {

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -88,4 +89,14 @@ public class adminController {
     public product_data updaterating(@PathVariable String id, @RequestBody ratingtemplate rating ){
         return service.updateRating(id, rating);
     }
+    @PostMapping("/addcatagoryid")
+    public ResponseEntity<?> addcategoryids() {
+        // return service.addcatrgoryId(entity);
+        return service.addManyCategory(service.getAllProductsFull());
+    }
+    @PostMapping("/addcatagoryidproduct")
+    public ResponseEntity<?> postMethodName() {
+        return service.addCategoryIdProducts(service.getAllProductsFull());
+    }
+    
 }

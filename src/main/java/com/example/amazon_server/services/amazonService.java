@@ -10,8 +10,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import com.example.amazon_server.Repository.amazonrepo;
+import com.example.amazon_server.Repository.catagoryrepo;
 import com.example.amazon_server.Repository.productrepo;
 import com.example.amazon_server.models.Product;
+import com.example.amazon_server.models.category;
 import com.example.amazon_server.models.comments;
 import com.example.amazon_server.models.product_data;
 import com.example.amazon_server.models.ratingtemplate;
@@ -26,6 +28,8 @@ import org.springframework.data.domain.Sort;
 public class amazonService {
     @Autowired
     private amazonrepo repo;
+    @Autowired
+    private catagoryrepo crepo;
     @Autowired
     private productrepo prepo;
     @Autowired
@@ -139,7 +143,8 @@ public class amazonService {
         prepo.deleteById(id);
     }
 
-    public void saveProductData(product_data product) {
+    private void saveProductData(product_data product) {
+       product.setCategoryId(crepo.findByCategory(product.getSubcategory()).getId());
        prepo.save(product);
     }
 
@@ -227,5 +232,29 @@ public class amazonService {
         int sumRatings = rate1 * 5 + rate2 * 4 + rate3 * 3 + rate4 * 2 + rate5 * 1;
 
         return (double) sumRatings / totalRatings;
+    }
+
+    public category addcatrgoryId(category category){
+        ObjectId objectId = new ObjectId();
+        category.setId(objectId.toString());
+        crepo.save(category);
+        return category;
+    }
+    public List<category> getAllCategory(){
+        return crepo.findAll();
+    }
+    public ResponseEntity<?> addManyCategory(List<product_data> product_data){
+        for( product_data product : product_data){
+            if(crepo.findByCategory(product.getSubcategory()) == null)
+                addcatrgoryId(new category(product.getSubcategory()));
+        }
+        return ResponseEntity.ok("Success");
+    }
+    public ResponseEntity<?> addCategoryIdProducts(List<product_data> product_data){
+        for( product_data product : product_data){
+            product.setCategoryId(crepo.findByCategory(product.getSubcategory()).getId());
+            saveProductData(product);
+        }
+        return ResponseEntity.ok("Success");
     }
 }
