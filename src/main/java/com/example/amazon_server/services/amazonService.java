@@ -1,6 +1,8 @@
 package com.example.amazon_server.services;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +91,37 @@ public class amazonService {
 
             return mongoTemplate.find(query, product_data.class);
         }
-        return getProductByCatagory(category);
+        else if(isValidRating(feature)){
+            query.addCriteria(Criteria.where("rating").gt(feature.toCharArray()[0]).exists(true));
+            query.with(Sort.by(Sort.Order.desc("rating")));
+        
+            return mongoTemplate.find(query, product_data.class);
+        }
+        else if(isValidPrice(feature)){
+            String[] price = feature.split("-");
+            query.addCriteria(Criteria.where("price").lt(Double.valueOf(price[1].trim())).exists(true));
+            query.with(Sort.by(Sort.Order.asc("price")));
+
+            return mongoTemplate.find(query, product_data.class);
+        }
+        else{
+            return getProductByCatagory(category);
+        }
+    }
+    private boolean isValidPrice(String feature) {
+        String[] price = feature.split("-");
+        if(price.length==2 && price[0].equals("Range")){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    private static final String RATING_PATTERN = "^[1-4] Stars & Up$";
+    private boolean isValidRating(String rating) {
+        Pattern pattern = Pattern.compile(RATING_PATTERN);
+        Matcher matcher = pattern.matcher(rating);
+        return matcher.matches();
     }
 
     public void saveCategory(Product product){

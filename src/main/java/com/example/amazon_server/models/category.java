@@ -7,11 +7,16 @@ public class category {
     @Id
     private String id;
     private String category;
+    private String mainCategory;
 
     public category() {
     }
     public category(String category){ 
         this.category = category;
+    }
+    public category(String category, String mainCategory){
+        this.category = category;
+        this.mainCategory = mainCategory;
     }
     public String getId() {
         return id;
@@ -21,6 +26,14 @@ public class category {
         this.id = id;
     }
 
+    public String getMainCategory() {
+        return mainCategory;
+    }
+
+    public void setMainCategory(String mainCategory) {
+        this.mainCategory = mainCategory;
+    }
+    
     public String getCategory() {
         return category;
     }

@@ -17,7 +17,7 @@ public class product_data {
     private String ratingCount;
     private ratingtemplate ratingVal;
     private String count;
-    private String price;
+    private Double price;
     private String shipping; //brand
     private List<String> moreBuyingChoices; //makelist
     private String discount;
@@ -42,7 +42,7 @@ public class product_data {
 
     
     public product_data(String id, String title, String imageUrl, List<String> description, String material,
-            String rating, String ratingCount, ratingtemplate ratingVal, String count, String price, String shipping,
+            String rating, String ratingCount, ratingtemplate ratingVal, String count, Double price, String shipping,
             List<String> moreBuyingChoices, String discount, String deal, String category, String return_policy,
             String warranty, String brand, List<com.example.amazon_server.models.comments> comments, String delivary,
             String recomended_use, String item_weight, String item_dimensions, String color, String special_features,
@@ -295,11 +295,11 @@ public class product_data {
         this.count = count;
     }
     
-    public String getPrice() {
+    public Double getPrice() {
         return price;
     }
     
-    public void setPrice(String price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
     
