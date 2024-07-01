@@ -190,7 +190,7 @@ public class amazonService {
         prepo.deleteAll();
     }
 
-     public ResponseEntity<?> addReview(comments comment, String id, String token) {
+     public ResponseEntity<?> addReview(comments comment, String id, Object token) {
         try{
             String userId = authservice.getUserIdFromJwt(token);
             return ResponseEntity.ok(addReviewToProduct(userId,comment,id));

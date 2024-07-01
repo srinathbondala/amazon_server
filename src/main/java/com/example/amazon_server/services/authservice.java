@@ -23,12 +23,15 @@ import com.example.amazon_server.jwt.JwtUtils;
 import com.example.amazon_server.models.CartDetails;
 import com.example.amazon_server.Repository.ordersrepo;
 import com.example.amazon_server.models.CartProductDetails;
+import com.example.amazon_server.models.Details;
 import com.example.amazon_server.models.authData;
 import com.example.amazon_server.models.orders;
 import com.example.amazon_server.models.product_data;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.result.UpdateResult;
+
+import ch.qos.logback.classic.Logger;
 
 @Service
 public class authservice {
@@ -266,11 +269,11 @@ public class authservice {
         }
     }
     private String isProductOrderedTrue(String productId, String userId) {
-        Query query = new Query(Criteria.where("orders.product_id").is(productId).and("cart.isCancelled").is(false));
+        Query query = new Query(Criteria.where("_id").is(userId).and("orders.product_id").is(productId).and("cart.isCancelled").is(false));
         return mongoTemplate.exists(query, authData.class) ? "true " : "false";
     }
 
-    public ResponseEntity<?>addOrder(orders data,String token) {
+    public ResponseEntity<?>addOrder(orders data,Object token) {
         try {
             String userId = getUserIdFromJwt(token);
             return ResponseEntity.ok(addOrderToDataBase(userId, data));
@@ -295,5 +298,49 @@ public class authservice {
         catch(Exception e){
             return e.getMessage();
         }
+    }
+    public ResponseEntity<?> updateAddress( Details details, Object token) {
+        try {
+            String userId = getUserIdFromJwt(token);
+            return ResponseEntity.ok(updateUserAdress(details,userId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error processing request");
+        }
+    }
+    private ResponseEntity<?> updateUserAdress(Details details, String userId) {
+        try {
+            Query query = new Query(Criteria.where("_id").is(userId).and("details.address").is(details.getAddress()));
+            Update update = new Update().set("details.$.address", details.getAddress()).set("details.$.city", details.getCity()).set("details.$.state", details.getState()).set("details.$.country", details.getCountry()).set("details.$.pincode", details.getPincode());
+            UpdateResult updateResult = mongoTemplate.updateFirst(query, update, authData.class);
+
+            if (updateResult.getMatchedCount() == 0) {
+                query = new Query(Criteria.where("_id").is(userId));
+                update = new Update().push("details", details);
+                mongoTemplate.updateFirst(query, update, authData.class);
+                return ResponseEntity.ok("Address added successfully for user: " + userId);
+            } else {
+                return ResponseEntity.ok("Address updated successfully for user: " + userId);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error processing request");
+        }
+    }
+    public ResponseEntity<?> DeleteAddress(Details details, Object token) {
+        try {
+            String userId = getUserIdFromJwt(token);
+            return ResponseEntity.ok(deleteAddress(userId, details));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error processing request");
+        }
+    }
+
+    private ResponseEntity<?> deleteAddress(String userId, Details details) {
+        Query query = new Query(Criteria.where("_id").is(userId));
+        Update update = new Update().pull("details", details);
+        UpdateResult result = mongoTemplate.updateFirst(query, update, authData.class);
+        if (result.getMatchedCount() == 0) {
+            return ResponseEntity.badRequest().body("Address not found");
+        }
+        return ResponseEntity.ok("Address deleted successfully");
     }
 }
