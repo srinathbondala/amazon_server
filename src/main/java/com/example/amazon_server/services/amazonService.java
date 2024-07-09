@@ -250,7 +250,7 @@ public class amazonService {
                 throw new IllegalArgumentException("Invalid rating value");
         }
         double newOverallRating = calculateOverallRating(ratingVal);
-        update.set("rating",String.format("%.1f", newOverallRating)+" out of 5 stars");
+        update.set("rating","%.1f".formatted(newOverallRating)+" out of 5 stars");
         mongoTemplate.updateFirst(query, update, product_data.class);
     }
     private double calculateOverallRating(ratingtemplate ratingVal) {

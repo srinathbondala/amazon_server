@@ -123,6 +123,7 @@ public class authenticationController {
         // Create new user's account
         authData user = new authData(signUpRequest.getUsername(), 
                 signUpRequest.getEmail(),
+                signUpRequest.getPhone(),
                 encoder.encode(signUpRequest.getPassword()));
 
         Set<String> strRoles = signUpRequest.getRoles();

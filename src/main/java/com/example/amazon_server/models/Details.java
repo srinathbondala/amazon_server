@@ -6,18 +6,34 @@ public class Details {
     @Id
     private String id;
     private String address;
+    private String name;
     private String city;
     private String state;
     private String country;
     private String pincode;
+    private String phone;
     public Details() {
     }
-    public Details(String address, String city, String state, String country, String pincode) {
+    public Details(String address, String city, String state, String country, String pincode,String phone,String name) {
         this.address = address;
         this.city = city;
         this.state = state;
         this.country = country;
         this.pincode = pincode;
+        this.phone = phone;
+        this.name = name;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getPhone() {
+        return phone;
+    }
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
     public String getId() {
         return id;

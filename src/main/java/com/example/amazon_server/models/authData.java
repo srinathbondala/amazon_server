@@ -43,13 +43,24 @@ public class authData {
     private List<String> wishList;
 
     private List<String> orders;
+
+    private String defaultAddress;
     
+    public String getDefaultAddress() {
+      return defaultAddress;
+    }
+
+    public void setDefaultAddress(String defaultAddress) {
+      this.defaultAddress = defaultAddress;
+    }
+
     public authData() {
     }
 
-    public authData(String username, String email, String password) {
+    public authData(String username, String email, String phone, String password) {
       this.username = username;
       this.email = email;
+      this.phone=phone;
       this.password = password;
     }
     

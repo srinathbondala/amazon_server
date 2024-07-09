@@ -1,5 +1,7 @@
 package com.example.amazon_server.controler;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +52,7 @@ public class userController {
     }
     
     @PostMapping("/removeFromCart")
-    public ResponseEntity<?> removeFromCart(@RequestBody CartDetails product, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> removeFromCart(@RequestBody List<CartDetails> product, @RequestHeader("Authorization") String token) {
         try{
             ResponseEntity<?> status = authservice.getdatafromjwt(token);
             if(status.getStatusCode() == HttpStatus.OK){
@@ -193,6 +195,47 @@ public class userController {
             ResponseEntity<?> status = authservice.getdatafromjwt(token);
             if(status.getStatusCode() == HttpStatus.OK){
                 return ResponseEntity.ok(authservice.DeleteAddress(entity,status.getBody()));
+            }
+            return ResponseEntity.ok("Error");
+        }
+        catch(Exception e){
+            return ResponseEntity.ok("Error");
+        }
+    }
+
+    @PostMapping("/defaultAddressSet")
+    public ResponseEntity<?> defaultAddressSet(@RequestBody Details entity, @RequestHeader("Authorization") String token){
+        try{
+            ResponseEntity<?> status = authservice.getdatafromjwt(token);
+            if(status.getStatusCode() == HttpStatus.OK){
+                return ResponseEntity.ok(authservice.defaultAddress(entity,status.getBody()));
+            }
+            return ResponseEntity.ok("Error");
+        }
+        catch(Exception e){
+            return ResponseEntity.ok("Error");
+        }
+    }
+    //userProfile
+    @PostMapping("/updateProfile/updateName")
+    public ResponseEntity<?> updateName(@RequestBody String name, @RequestHeader("Authorization") String token){
+        try{
+            ResponseEntity<?> status = authservice.getdatafromjwt(token);
+            if(status.getStatusCode() == HttpStatus.OK){
+                return ResponseEntity.ok(authservice.updateUserName(name,status.getBody(),"username"));
+            }
+            return ResponseEntity.ok("Error");
+        }
+        catch(Exception e){
+            return ResponseEntity.ok("Error");
+        }
+    }
+    @PostMapping("/updateProfile/updatePhone")
+    public ResponseEntity<?> updatePhoneNo(@RequestBody String phone, @RequestHeader("Authorization") String token){
+        try{
+            ResponseEntity<?> status = authservice.getdatafromjwt(token);
+            if(status.getStatusCode() == HttpStatus.OK){
+                return ResponseEntity.ok(authservice.updateUserName(phone,status.getBody(),"phone"));
             }
             return ResponseEntity.ok("Error");
         }
