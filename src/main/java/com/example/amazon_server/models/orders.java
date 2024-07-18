@@ -1,5 +1,6 @@
 package com.example.amazon_server.models;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -9,10 +10,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class orders {
     @Id
     private String order_id;
-    private String order_date;
+    private Date order_date;
     private Boolean isDelivered;
     private Boolean isCancelled;
-    private String totalPrice;
+    private Double totalPrice;
     private Details shippingAddress;
     private String userId;
     private List<orderStatus> order_status;
@@ -28,8 +29,8 @@ public class orders {
     public orders() {
     }
     
-    public orders(String order_id, String order_date, List<orderStatus> order_status,
-            String totalPrice, Details shippingAddress, Boolean isDelivered , Boolean isCancelled, String userId) {
+    public orders(String order_id, Date order_date, List<orderStatus> order_status,
+            Double totalPrice, Details shippingAddress, Boolean isDelivered , Boolean isCancelled, String userId) {
         this.order_id = order_id;
         this.order_date = order_date;
         this.order_status = order_status;
@@ -62,10 +63,10 @@ public class orders {
     public void setOrder_id(String order_id) {
         this.order_id = order_id;
     }
-    public String getOrder_date() {
+    public Date getOrder_date() {
         return order_date;
     }
-    public void setOrder_date(String order_date) {
+    public void setOrder_date(Date order_date) {
         this.order_date = order_date;
     }
     public List<orderStatus> getOrder_status() {
@@ -74,10 +75,10 @@ public class orders {
     public void setOrder_status(List<orderStatus> order_status) {
         this.order_status = order_status;
     }
-    public String getTotalPrice() {
+    public Double getTotalPrice() {
         return totalPrice;
     }
-    public void setTotalPrice(String totalPrice) {
+    public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
     }
     public Details getShippingAddress() {

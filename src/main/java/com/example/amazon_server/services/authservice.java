@@ -1,11 +1,16 @@
 package com.example.amazon_server.services;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -298,21 +303,9 @@ public class authservice {
         data.setUserId(userId);
         data.setIsDelivered(false);
         data.setIsCancelled(false);
-        data.setOrder_date(new Date().toString());
+        data.setOrder_date(new Date());
         orders savedOrder = ordersrepo.save(data);
         String orderdata = savedOrder.getOrder_id();
-        /*  Query query = new Query(Criteria.where("id").is(userId));
-            Update update = new Update().push("orders",orderdata);
-            mongoTemplate.updateFirst(query, update, authData.class);
-        data.getOrder_status().forEach(orderStatus -> {
-                    Query query1 = new Query(Criteria.where("product_id").is(orderStatus.getProduct_id()));
-                    Update update1 = new Update().push("productOrder",new productOrder(orderdata,userId));
-                    UpdateResult updateResult = mongoTemplate.updateFirst(query1, update1, productOrderobj.class);
-                    if(updateResult.getMatchedCount() == 0){
-                        productOrderobj productOrder = new productOrderobj(orderStatus.getProduct_id(),List.of(new productOrder(orderdata,userId)));
-                        productOrdersrepo.save(productOrder);
-                    }
-                });*/
         
         ;
         return addtoOrders(data,userId,orderdata)&&addOrdertoProductOrder(data,userId,orderdata)?"Order added successfully":"Error"; 
@@ -347,6 +340,147 @@ public class authservice {
             return false;
         }
     }
+    
+    /*  Query query = new Query(Criteria.where("id").is(userId));
+        Update update = new Update().push("orders",orderdata);
+        mongoTemplate.updateFirst(query, update, authData.class);
+    data.getOrder_status().forEach(orderStatus -> {
+                Query query1 = new Query(Criteria.where("product_id").is(orderStatus.getProduct_id()));
+                Update update1 = new Update().push("productOrder",new productOrder(orderdata,userId));
+                UpdateResult updateResult = mongoTemplate.updateFirst(query1, update1, productOrderobj.class);
+                if(updateResult.getMatchedCount() == 0){
+                    productOrderobj productOrder = new productOrderobj(orderStatus.getProduct_id(),List.of(new productOrder(orderdata,userId)));
+                    productOrdersrepo.save(productOrder);
+                }
+            });*/
+    public ResponseEntity<?> getOrders1(Object token,String range){
+        try {
+            String userId = getUserIdFromJwt(token);
+            return ResponseEntity.ok(getOrderFormDataBase(userId,range));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    private List<orders> getOrderFormDataBase(String userId,String range) {
+        Calendar calendar = Calendar.getInstance();
+        String[] ranges = range.split("-");
+        if(ranges[0].equals("months")){
+            Date endDate = new Date();
+            calendar.setTime(endDate);
+            calendar.add(Calendar.MONTH, -3);
+            Date startDate = calendar.getTime();
+            return findOrdersWithinDateRange(startDate, endDate, userId);
+        }
+        else if(ranges[0].equals("previous")){
+            //set End date to december of last year
+            calendar.set(Calendar.YEAR, Integer.valueOf(ranges[1]));
+            calendar.set(Calendar.MONTH, Calendar.DECEMBER);
+            calendar.set(Calendar.DAY_OF_MONTH, 31);
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+            calendar.set(Calendar.SECOND, 59);
+            Date endDate = calendar.getTime();
+    
+            // Set start date to January 1st of last year
+            calendar.set(Calendar.YEAR, Integer.valueOf(ranges[1]));
+            calendar.set(Calendar.MONTH, Calendar.JANUARY);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            Date startDate = calendar.getTime();
+    
+            return findOrdersWithinDateRange(startDate, endDate, userId);
+        }
+        else if(ranges[0].equals("current")){
+
+            calendar.set(Calendar.YEAR, Integer.valueOf(ranges[1]));
+            calendar.set(Calendar.MONTH, Calendar.JANUARY);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            Date startDate = calendar.getTime();
+
+            // Set end date to December 31st of the given year
+            calendar.set(Calendar.YEAR, Integer.valueOf(ranges[1]));
+            calendar.set(Calendar.MONTH, Calendar.DECEMBER);
+            calendar.set(Calendar.DAY_OF_MONTH, 31);
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+            calendar.set(Calendar.SECOND, 59);
+            Date endDate = calendar.getTime();
+    
+            return findOrdersWithinDateRange(startDate, endDate, userId);    
+        }
+        else{
+            Query query = new Query(Criteria.where("userId").is(userId));
+            return mongoTemplate.find(query,orders.class);
+        }
+    }
+    private static final Logger logger = LoggerFactory.getLogger(authservice.class);
+
+    public List<orders> findOrdersWithinDateRange(Date startDate, Date endDate, String userId) {
+        SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        Query query = new Query(Criteria.where("userId").is(userId));
+        logger.info("Start Date = "+DATE_FORMAT.format(startDate));
+        logger.info("End Date = "+DATE_FORMAT.format(endDate));
+
+        Criteria dateCriteria;
+        try {
+            dateCriteria = new Criteria().andOperator(
+                Criteria.where("order_date").gte(DATE_FORMAT.parse(DATE_FORMAT.format(startDate))),
+                Criteria.where("order_date").lte(DATE_FORMAT.parse(DATE_FORMAT.format(endDate)))
+            );
+            
+            query.addCriteria(dateCriteria);
+            return mongoTemplate.find(query, orders.class);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @SuppressWarnings("null")
+    public ResponseEntity<?> updateOrderList(Object token, String orderId){
+        try {
+                String userId = getUserIdFromJwt(token);
+                Query query2 = new Query(Criteria.where("_id").is(orderId));
+                orders ord =  mongoTemplate.findOne(query2, orders.class);
+                ordersrepo.deleteById(orderId);
+                Query query = new Query(Criteria.where("id").is(userId));
+                Update update = new Update().pull("orders",orderId);
+                mongoTemplate.updateFirst(query, update, authData.class);
+                ord.getOrder_status().forEach(orderStatus -> {
+                    Query query1 = new Query(Criteria.where("product_id").is(orderStatus.getProduct_id()));
+                    Update update1 = new Update().pull("productOrder",Query.query(Criteria.where("order_id").is(orderId).and("user_id").is(userId)));
+                    mongoTemplate.updateFirst(query1,update1, productOrderobj.class);
+                });
+                return ResponseEntity.ok(ord);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+    
+    // orders savedOrder = ordersrepo.save(data);
+    //     String orderdata = savedOrder.getOrder_id();
+        /*  Query query = new Query(Criteria.where("id").is(userId));
+            Update update = new Update().push("orders",orderdata);
+            mongoTemplate.updateFirst(query, update, authData.class);
+        data.getOrder_status().forEach(orderStatus -> {
+                    Query query1 = new Query(Criteria.where("product_id").is(orderStatus.getProduct_id()));
+                    Update update1 = new Update().push("productOrder",new productOrder(orderdata,userId));
+                    UpdateResult updateResult = mongoTemplate.updateFirst(query1, update1, productOrderobj.class);
+                    if(updateResult.getMatchedCount() == 0){
+                        productOrderobj productOrder = new productOrderobj(orderStatus.getProduct_id(),List.of(new productOrder(orderdata,userId)));
+                        productOrdersrepo.save(productOrder);
+                    }
+                });
+
+
+
+
 
     /*---------------------------------Address Services---------------------------------*/
 
@@ -434,5 +568,4 @@ public class authservice {
         }
         return "User name updated successfully";
     }
-
 }

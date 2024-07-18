@@ -14,13 +14,21 @@ public class orderStatus {
     private String status;
     private Double price;
     private String delivery_date;
+    private int quantity;
     public orderStatus(){}
-    public orderStatus(String product_id, List<Pair<Date, String>> comments, String status , Double price, String delivery_date) {
+    public orderStatus(String product_id, List<Pair<Date, String>> comments, String status , Double price, String delivery_date, int quantity) {
         this.product_id = product_id;
         this.comments = comments;
         this.status = status;
         this.price = price;
         this.delivery_date=delivery_date;
+        this.quantity = quantity;
+    }
+    public int getQuantity() {
+        return quantity;
+    }
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
     public Double getPrice() {
         return price;

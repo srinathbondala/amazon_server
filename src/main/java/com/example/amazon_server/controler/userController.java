@@ -133,6 +133,8 @@ public class userController {
             return ResponseEntity.ok("Error");
         }
     }
+
+    //orders endpoint 
     @GetMapping("/isProductOrdered/{productId}")
     public ResponseEntity<?> getMethodName(@PathVariable String productId, @RequestHeader("Authorization") String token){
         try{
@@ -153,6 +155,20 @@ public class userController {
             ResponseEntity<?> status = authservice.getdatafromjwt(token);
             if(status.getStatusCode() == HttpStatus.OK){
                 return ResponseEntity.ok(authservice.addOrder(data,status.getBody()));
+            }
+            return ResponseEntity.ok("Error");
+        }
+        catch(Exception e){
+            return ResponseEntity.ok("Error");
+        }
+    }
+
+    @GetMapping("/getOrders/{range}")
+    public ResponseEntity<?> getOrders(@PathVariable String range, @RequestHeader("Authorization") String token){
+        try{
+            ResponseEntity<?> status = authservice.getdatafromjwt(token);
+            if(status.getStatusCode() == HttpStatus.OK){
+                return ResponseEntity.ok(authservice.getOrders1(status.getBody(),range));
             }
             return ResponseEntity.ok("Error");
         }
@@ -243,4 +259,18 @@ public class userController {
             return ResponseEntity.ok("Error");
         }
     }
+    @DeleteMapping("/updateOrder")
+    public ResponseEntity<?> updateOrder(@RequestBody String orderId, @RequestHeader("Authorization") String token) {
+        try{
+            ResponseEntity<?> status = authservice.getdatafromjwt(token);
+            if(status.getStatusCode() == HttpStatus.OK){
+                return authservice.updateOrderList(status.getBody(),orderId);
+            }
+            return ResponseEntity.badRequest().body(null);
+        }
+        catch(Exception e){
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+    
 }
