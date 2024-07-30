@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.amazon_server.Repository.amazonrepo;
 import com.example.amazon_server.Repository.catagoryrepo;
@@ -26,6 +27,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Sort;
 
+@Transactional
 @Service
 public class amazonService {
     @Autowired
