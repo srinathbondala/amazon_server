@@ -1,7 +1,8 @@
 # Amazon Clone Backend
 
 Welcome to the Amazon Clone Backend! This repository contains the backend code for the Amazon Clone project, implemented using Spring Boot and MongoDB. It includes JWT authentication and Spring Security for secure API calls and provides all the necessary routes to support the frontend functionalities.
-
+## Amazon frontend 
+https://github.com/srinathbondala/amazon_replica
 ## Features
 
 - User Authentication (JWT)
