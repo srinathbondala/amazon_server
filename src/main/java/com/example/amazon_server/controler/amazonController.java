@@ -14,8 +14,8 @@ import com.example.amazon_server.models.product_data;
 import com.example.amazon_server.services.amazonService;
 
 @RestController
-@RequestMapping("/amazon")
 @CrossOrigin(origins = "*")
+@RequestMapping("/amazon")
 public class amazonController {
     
     @Autowired
